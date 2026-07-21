@@ -1,6 +1,6 @@
 import { useLobbyParticipants } from '../../hooks/useLobbyParticipants'
 import type { BetState, Phase } from '../../lib/gameTypes'
-import { ChartCanvas } from './ChartCanvas'
+import { ChartCanvas, type ExitMarker } from './ChartCanvas'
 import { PlayersAside } from './PlayersAside'
 
 interface Point {
@@ -36,6 +36,16 @@ export function ChartMain({
     countdown,
   })
 
+  const exitMarkers: ExitMarker[] = lobby.rows
+    .filter((r) => r.status === 'cashed' && r.mult != null)
+    .map((r) => ({
+      key: r.key,
+      name: r.name,
+      avatarHue: r.avatarHue,
+      mult: r.mult!,
+      isPlayer: r.isPlayer,
+    }))
+
   return (
     <section className="ChartMain">
       <div className="ChartMain__left">
@@ -45,6 +55,8 @@ export function ChartMain({
           phase={phase}
           crashPoint={crashPoint}
           countdown={countdown}
+          bet={bet}
+          exitMarkers={exitMarkers}
         />
       </div>
 

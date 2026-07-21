@@ -17,9 +17,9 @@ export const gameConfig = {
   growth: {
     decimals: 2,
     stages: [
-      { rate: 0.07, until: 20 },
-      { rate: 0.04, until: 100 },
-      { rate: 0.025, until: Infinity },
+      { rate: 0.11, until: 20 },
+      { rate: 0.065, until: 100 },
+      { rate: 0.04, until: Infinity },
     ],
   },
 

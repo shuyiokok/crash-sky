@@ -247,6 +247,14 @@
   display: grid;
   place-items: center;
   pointer-events: none;
+  z-index: 2;
+}
+
+.ChartMain__centerStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 .ChartMain__multText {
@@ -269,6 +277,91 @@
 .ChartMain__multText.is-wait {
   font-size: 1.8rem;
   opacity: 0.75;
+}
+
+.ChartMain__waitBet {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  color: rgba(255, 255, 255, 0.88);
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+}
+
+.ChartMain__playerCashout {
+  margin-top: 2px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(245, 248, 252, 0.92);
+  color: #1a2433;
+  font-size: 1.05rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+}
+
+.ChartMain__exitLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.ChartMain__botExit {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transform: translate(-50%, -120%);
+  padding: 3px 8px 3px 3px;
+  border-radius: 999px;
+  background: rgba(12, 16, 24, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  white-space: nowrap;
+  animation: botExitIn 0.28s ease;
+}
+
+.ChartMain__botExit.is-leaving {
+  animation: botExitOut 0.45s ease forwards;
+}
+
+.ChartMain__botExitAvatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ChartMain__botExitName {
+  max-width: 88px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 11px;
+  font-weight: 700;
+  color: #f2f5fa;
+}
+
+@keyframes botExitIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -80%) scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -120%) scale(1);
+  }
+}
+
+@keyframes botExitOut {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -120%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -145%) scale(0.9);
+  }
 }
 
 .ChartMain__players {
