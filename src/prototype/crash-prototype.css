@@ -1,0 +1,695 @@
+/**
+ * Crash 弹窗原型样式
+ * 全局色：主体 #0E1218｜主文字 #FFFFFF｜盈利 #39e068
+ * 控件：矩形圆角 8px｜加减正圆白底黑字｜方形白底复选框
+ */
+
+/* ========== 图层 Mask ========== */
+.Mask {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+}
+
+.Mask__dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5); /* 50% 透明黑遮罩 */
+}
+
+.Mask__panel {
+  position: relative;
+  z-index: 1;
+  width: min(1100px, 100%);
+  /* 容纳 12 行机器人列表后整体加高 */
+  height: min(980px, 100svh);
+  max-height: min(980px, 100svh);
+  overflow: hidden;
+  background: #0e1218;
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+  font-family: Sora, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+/* ========== 图层 TopBar ========== */
+.TopBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.TopBar__history {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.TopBar__historyLabel {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #1a222d;
+  color: #fff;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* 单行槽位：按可用宽度裁切，丢弃最左旧局 */
+.TopBar__pillsSlot {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  overflow: hidden;
+}
+
+.TopBar__pills {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+}
+
+.TopBar__pills--measure {
+  position: absolute;
+  left: 0;
+  top: 0;
+  visibility: hidden;
+  pointer-events: none;
+  height: auto;
+}
+
+.TopBar__pill {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0b0f14;
+  font-variant-numeric: tabular-nums;
+}
+
+.TopBar__pill.tone-blue {
+  background: #4aa3ff;
+}
+.TopBar__pill.tone-yellow {
+  background: #f2d04b;
+}
+.TopBar__pill.tone-red {
+  background: #ff5b5b;
+}
+.TopBar__pill.tone-orange {
+  background: #ff9a3c;
+}
+.TopBar__pill.tone-white {
+  background: #eef1f5;
+  color: #222;
+}
+
+.TopBar__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.TopBar__plays {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffd76a;
+  white-space: nowrap;
+}
+
+.TopBar__close {
+  height: 32px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111111;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.CrashDialog {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.CrashDialog__card {
+  width: min(360px, 86%);
+  padding: 22px 20px;
+  border-radius: 12px;
+  background: #1a2230;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  text-align: center;
+}
+
+.CrashDialog__card h3 {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+}
+
+.CrashDialog__card p {
+  margin: 0 0 18px;
+  opacity: 0.78;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.CrashDialog__actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.CrashDialog__actions button {
+  min-width: 100px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.CrashDialog__actions button.is-ghost {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.CrashDialog__actions button.is-danger {
+  background: #ff5b5b;
+  color: #fff;
+}
+
+/* ========== 图层 ChartMain ========== */
+.ChartMain {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 10px;
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.ChartMain__left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.ChartMain__canvasWrap {
+  position: relative;
+  flex: 1;
+  min-height: min(58svh, 520px);
+  height: 100%;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #0a0e14;
+  overflow: hidden;
+}
+
+.ChartMain__canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.ChartMain__centerMult {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.ChartMain__multText {
+  font-size: clamp(2.6rem, 7vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  text-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+}
+
+.ChartMain__multText.is-rolling {
+  animation: multPulse 0.85s ease-in-out infinite;
+}
+
+.ChartMain__multText.is-crash {
+  color: #ff5b5b;
+  animation: crashFlash 0.45s ease;
+}
+
+.ChartMain__multText.is-wait {
+  font-size: 1.8rem;
+  opacity: 0.75;
+}
+
+.ChartMain__players {
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #141a22;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.ChartMain__playersHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  padding: 0 4px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ChartMain__userStat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+}
+
+.ChartMain__userStat.is-bump {
+  animation: countBump 0.42s ease;
+}
+
+@keyframes countBump {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.28);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.ChartMain__userIco {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  display: inline-block;
+  position: relative;
+}
+
+.ChartMain__userIco::after {
+  content: '';
+  position: absolute;
+  inset: 4px 4px 3px;
+  border-radius: 50%;
+  background: #0e1218;
+}
+
+.ChartMain__chipTotal {
+  opacity: 0.85;
+}
+
+.ChartMain__playerList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.ChartMain__playerRow {
+  display: grid;
+  /* 头像｜名称｜结束倍率｜金币 */
+  grid-template-columns: 18px minmax(0, 1.2fr) auto minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+  font-size: 12px;
+  padding: 5px 4px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  flex-shrink: 0;
+}
+
+.ChartMain__playerRow.is-player {
+  background: rgba(57, 224, 104, 0.08);
+  outline: 1px solid rgba(57, 224, 104, 0.2);
+}
+
+.ChartMain__avatar {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #6ecbff, #3a7bd5);
+  flex-shrink: 0;
+}
+
+.ChartMain__pid {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.9;
+}
+
+.ChartMain__mult,
+.ChartMain__pending {
+  white-space: nowrap;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.ChartMain__pending {
+  opacity: 0.65;
+  font-weight: 600;
+}
+
+/* 结束倍率：按高低变色 */
+.ChartMain__mult.tone-blue {
+  color: #4aa3ff;
+}
+.ChartMain__mult.tone-yellow {
+  color: #f2d04b;
+}
+.ChartMain__mult.tone-orange {
+  color: #ff9a3c;
+}
+.ChartMain__mult.tone-red {
+  color: #ff5b5b;
+}
+.ChartMain__mult.tone-white {
+  color: #eef1f5;
+}
+
+.ChartMain__profit {
+  font-weight: 700;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ChartMain__profit.is-win {
+  color: #39e068; /* 成功撤退金币 */
+}
+
+.ChartMain__profit.is-lose {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.ChartMain__profit.is-pending {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* ========== 图层 BottomCtrl ========== */
+.BottomCtrl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #121821;
+  flex-shrink: 0;
+}
+
+.BottomCtrl__left,
+.BottomCtrl__right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.BottomCtrl__circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: #ffffff;
+  color: #111111;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.BottomCtrl__circle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.BottomCtrl__input {
+  width: 72px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #0a0e14;
+  color: #ffffff;
+  text-align: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.BottomCtrl__input--amt {
+  width: 108px;
+}
+
+.BottomCtrl__suffix {
+  font-weight: 700;
+  margin-left: -4px;
+}
+
+.BottomCtrl__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+
+.BottomCtrl__autoBet {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #243041;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.BottomCtrl__autoBet.is-on {
+  background: linear-gradient(135deg, #39e068, #1f9d4a);
+  border-color: transparent;
+  color: #041208;
+  box-shadow: 0 0 0 1px rgba(57, 224, 104, 0.35);
+}
+
+.BottomCtrl__max {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #243041;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.BottomCtrl__max:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.BottomCtrl__bet {
+  height: 40px;
+  min-width: 104px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #3ddc84, #27b965);
+  color: #06210f;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.BottomCtrl__bet.is-cash {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 200px;
+  padding: 0 22px;
+  background: linear-gradient(180deg, #ffd76a, #f0a93a);
+  color: #2a1a05;
+}
+
+/* 未参与本局：预约下回合 */
+.BottomCtrl__bet.is-next {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  height: 48px;
+  min-width: 120px;
+  padding: 4px 16px;
+  line-height: 1.15;
+}
+
+.BottomCtrl__betLine {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.BottomCtrl__betSub {
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+/* 固定金额槽位 + 等宽数字，滚动时不抖 */
+.BottomCtrl__cashAmt {
+  display: inline-block;
+  min-width: 9ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: 0.02em;
+}
+
+.BottomCtrl__bet.is-cancel {
+  background: #3a4452;
+  color: #fff;
+}
+
+.BottomCtrl__bet.is-disabled,
+.BottomCtrl__bet:disabled {
+  background: #2a3340;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: not-allowed;
+}
+
+/* ========== 图层 SettingTip ========== */
+.SettingTip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  opacity: 0.88;
+  cursor: pointer;
+  width: fit-content;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+/* 通用方形白底复选框 */
+.ui-squareCheck {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #ffffff;
+  border-radius: 2px;
+  background: #ffffff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.ui-squareCheck:checked::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: #111111;
+}
+
+@keyframes multPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+@keyframes crashFlash {
+  0%,
+  100% {
+    transform: translateX(0);
+    filter: brightness(1);
+  }
+  30% {
+    transform: translateX(-5px);
+    filter: brightness(1.35);
+  }
+  60% {
+    transform: translateX(5px);
+  }
+}
+
+@media (max-width: 860px) {
+  .Mask__panel {
+    height: min(100svh, 980px);
+    overflow: auto;
+  }
+
+  .ChartMain {
+    grid-template-columns: 1fr;
+    flex: none;
+  }
+
+  .ChartMain__canvasWrap {
+    min-height: min(40svh, 360px);
+    height: min(40svh, 360px);
+  }
+
+  .ChartMain__players {
+    height: auto;
+    max-height: 320px;
+  }
+
+  .BottomCtrl {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
