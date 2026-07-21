@@ -129,13 +129,13 @@ export function CrashPopup({
 }
 
 export function useCrashPopupGate() {
-  const [open, setOpen] = useState(true)
+  /** 默认停在开始页，点「开始游戏」后再进入 */
+  const [open, setOpen] = useState(false)
   const [suppressToday, setSuppressToday] = useState(false)
 
   useEffect(() => {
     if (localStorage.getItem(SUPPRESS_KEY) === todayKey()) {
       setSuppressToday(true)
-      setOpen(false)
     }
   }, [])
 
