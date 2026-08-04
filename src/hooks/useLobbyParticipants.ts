@@ -173,12 +173,6 @@ export function useLobbyParticipants({
     setBots(seedBots(listSize, betMin, betMax, skipRatio))
   }, [roundId, listSize, betMin, betMax, skipRatio])
 
-  const playerInRound =
-    bet.status === 'queued' ||
-    bet.status === 'active' ||
-    bet.status === 'cashed' ||
-    bet.status === 'lost'
-
   const bettingElapsed = Math.max(0, 5 - countdown)
 
   const rows: LobbyRow[] = useMemo(() => {
@@ -281,83 +275,84 @@ export function useLobbyParticipants({
       }
     })
 
-    let playerRow: LobbyRow | null = null
-    if (playerInRound) {
-      if (bet.status === 'queued') {
-        playerRow = {
-          key: 'player',
-          name: '我',
-          avatarHue: 140,
-          isPlayer: true,
-          betAmount: bet.amount,
-          status: 'betting',
-          mult: null,
-          multTone: null,
-          winCoins: null,
-          waitLabel: '已确认',
-        }
-      } else if (bet.status === 'active') {
-        playerRow = {
-          key: 'player',
-          name: '我',
-          avatarHue: 140,
-          isPlayer: true,
-          betAmount: bet.amount,
-          status: 'active',
-          mult: null,
-          multTone: null,
-          winCoins: null,
-        }
-      } else if (bet.status === 'cashed') {
-        const m = bet.cashoutAt ?? 1
-        playerRow = {
-          key: 'player',
-          name: '我',
-          avatarHue: 140,
-          isPlayer: true,
-          betAmount: bet.amount,
-          status: 'cashed',
-          mult: m,
-          multTone: colorForCrash(m),
-          winCoins: bet.amount * m,
-        }
-      } else {
-        const m = crashPoint ?? multiplier
-        playerRow = {
-          key: 'player',
-          name: '我',
-          avatarHue: 140,
-          isPlayer: true,
-          betAmount: bet.amount,
-          status: 'lost',
-          mult: m,
-          multTone: colorForCrash(m),
-          winCoins: null,
-        }
+    let playerRow: LobbyRow
+    if (bet.status === 'queued') {
+      playerRow = {
+        key: 'player',
+        name: '我',
+        avatarHue: 140,
+        isPlayer: true,
+        betAmount: bet.amount,
+        status: 'betting',
+        mult: null,
+        multTone: null,
+        winCoins: null,
+        waitLabel: '已确认',
+      }
+    } else if (bet.status === 'active') {
+      playerRow = {
+        key: 'player',
+        name: '我',
+        avatarHue: 140,
+        isPlayer: true,
+        betAmount: bet.amount,
+        status: 'active',
+        mult: null,
+        multTone: null,
+        winCoins: null,
+      }
+    } else if (bet.status === 'cashed') {
+      const m = bet.cashoutAt ?? 1
+      playerRow = {
+        key: 'player',
+        name: '我',
+        avatarHue: 140,
+        isPlayer: true,
+        betAmount: bet.amount,
+        status: 'cashed',
+        mult: m,
+        multTone: colorForCrash(m),
+        winCoins: bet.amount * m,
+      }
+    } else if (bet.status === 'lost') {
+      const m = crashPoint ?? multiplier
+      playerRow = {
+        key: 'player',
+        name: '我',
+        avatarHue: 140,
+        isPlayer: true,
+        betAmount: bet.amount,
+        status: 'lost',
+        mult: m,
+        multTone: colorForCrash(m),
+        winCoins: null,
+      }
+    } else {
+      // 未下注：始终置顶显示
+      playerRow = {
+        key: 'player',
+        name: '我',
+        avatarHue: 140,
+        isPlayer: true,
+        betAmount: 0,
+        status: 'betting',
+        mult: null,
+        multTone: null,
+        winCoins: null,
+        waitLabel: '等待中',
       }
     }
 
-    const merged = playerRow ? [playerRow, ...botRows] : botRows
-    return merged.sort((a, b) => {
-      if (a.isPlayer !== b.isPlayer) return a.isPlayer ? -1 : 1
+    // 玩家永远置顶；其余机器人按状态排序
+    const sortedBots = [...botRows].sort((a, b) => {
       const rank = (s: RowStatus) =>
         s === 'cashed' ? 0 : s === 'active' || s === 'betting' ? 1 : 2
       const dr = rank(a.status) - rank(b.status)
       if (dr !== 0) return dr
       return (b.winCoins ?? 0) - (a.winCoins ?? 0)
     })
-  }, [
-    bots,
-    phase,
-    multiplier,
-    crashPoint,
-    bet,
-    playerInRound,
-    bettingElapsed,
-  ])
-
-  // Fix typo in lost player branch - I accidentally used b.avatarHue
-  // Let me fix that in the write - actually I need to fix the file
+    return [playerRow, ...sortedBots]
+  }, [bots, phase, multiplier, crashPoint, bet, bettingElapsed])
 
   const listStake = rows.reduce((s, r) => s + r.betAmount, 0)
   const hiddenCount = Math.max(0, totalCount - rows.length)
