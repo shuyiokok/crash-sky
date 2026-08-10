@@ -146,6 +146,13 @@
   font-weight: 700;
   cursor: pointer;
   flex-shrink: 0;
+  transform: none;
+}
+
+.TopBar__close:hover,
+.TopBar__close:active,
+.TopBar__close:focus {
+  transform: none;
 }
 
 .CrashDialog {
@@ -193,6 +200,13 @@
   color: #111;
   font-weight: 700;
   cursor: pointer;
+  transform: none;
+}
+
+.CrashDialog__actions button:hover,
+.CrashDialog__actions button:active,
+.CrashDialog__actions button:focus {
+  transform: none;
 }
 
 .CrashDialog__actions button.is-ghost {
@@ -559,6 +573,13 @@
   cursor: pointer;
   display: grid;
   place-items: center;
+  transform: none;
+}
+
+.BottomCtrl__circle:hover,
+.BottomCtrl__circle:active,
+.BottomCtrl__circle:focus {
+  transform: none;
 }
 
 .BottomCtrl__circle:disabled {
@@ -606,6 +627,13 @@
   font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
+  transform: none;
+}
+
+.BottomCtrl__autoBet:hover,
+.BottomCtrl__autoBet:active,
+.BottomCtrl__autoBet:focus {
+  transform: none;
 }
 
 .BottomCtrl__autoBet.is-on {
@@ -624,6 +652,13 @@
   color: #fff;
   font-weight: 800;
   cursor: pointer;
+  transform: none;
+}
+
+.BottomCtrl__max:hover,
+.BottomCtrl__max:active,
+.BottomCtrl__max:focus {
+  transform: none;
 }
 
 .BottomCtrl__max:disabled {
@@ -632,8 +667,10 @@
 }
 
 .BottomCtrl__bet {
-  height: 40px;
-  min-width: 104px;
+  height: 48px;
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
   padding: 0 18px;
   border: none;
   border-radius: 12px;
@@ -642,30 +679,27 @@
   font-size: 16px;
   font-weight: 800;
   cursor: pointer;
+  transform: none;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.15;
+}
+
+.BottomCtrl__bet:hover,
+.BottomCtrl__bet:active,
+.BottomCtrl__bet:focus {
+  transform: none;
 }
 
 .BottomCtrl__bet.is-cash {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   gap: 8px;
-  min-width: 200px;
-  padding: 0 22px;
+  flex-direction: row;
   background: linear-gradient(180deg, #ffd76a, #f0a93a);
   color: #2a1a05;
-}
-
-/* 未参与本局：预约下回合 */
-.BottomCtrl__bet.is-next {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
-  height: 48px;
-  min-width: 120px;
-  padding: 4px 16px;
-  line-height: 1.15;
 }
 
 .BottomCtrl__betLine {

@@ -2,7 +2,9 @@
  * 冲上云霄 · 可分享试玩入口
  * 先显示开始页，点「开始游戏」后再进入对局
  */
+import { useState } from 'react'
 import { CrashPopup, useCrashPopupGate } from './prototype/CrashPopup'
+import { CurveLab } from './prototype/CurveLab'
 import { useCrashGame } from './hooks/useCrashGame'
 import { gameConfig } from './config/gameConfig'
 import './App.css'
@@ -10,6 +12,11 @@ import './App.css'
 function App() {
   const game = useCrashGame()
   const gate = useCrashPopupGate()
+  const [showLab, setShowLab] = useState(false)
+
+  if (showLab) {
+    return <CurveLab onBack={() => setShowLab(false)} />
+  }
 
   return (
     <div className="app-root">
@@ -32,6 +39,13 @@ function App() {
             }}
           >
             开始游戏
+          </button>
+          <button
+            type="button"
+            className="open-lab"
+            onClick={() => setShowLab(true)}
+          >
+            倍率曲线调参
           </button>
           <ul className="lobby-tips">
             <li>5 秒内确认下注，倍率上涨后点「领奖」提现</li>

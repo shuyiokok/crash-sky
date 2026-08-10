@@ -1,6 +1,5 @@
 import { gameConfig } from '../config/gameConfig'
-
-type Stage = (typeof gameConfig.growth.stages)[number]
+import { getGrowthStages, type GrowthStage } from '../config/growthStore'
 
 interface ResolvedStage {
   rate: number
@@ -9,7 +8,9 @@ interface ResolvedStage {
   startT: number
 }
 
-function resolveStages(stages: readonly Stage[]): ResolvedStage[] {
+export function resolveStages(
+  stages: readonly GrowthStage[],
+): ResolvedStage[] {
   const out: ResolvedStage[] = []
   let fromM = 1
   let startT = 0
@@ -24,17 +25,18 @@ function resolveStages(stages: readonly Stage[]): ResolvedStage[] {
   return out
 }
 
-const resolved = () => resolveStages(gameConfig.growth.stages)
-
 export function floor2(n: number, decimals = gameConfig.growth.decimals): number {
   const f = 10 ** decimals
   return Math.floor(n * f) / f
 }
 
 /** Display multiplier at elapsed time t (seconds). */
-export function multiplierAt(t: number): number {
+export function multiplierAt(
+  t: number,
+  stageList: readonly GrowthStage[] = getGrowthStages(),
+): number {
   if (t <= 0) return 1
-  const stages = resolved()
+  const stages = resolveStages(stageList)
   let m = 1
   for (let i = 0; i < stages.length; i++) {
     const s = stages[i]!
@@ -49,9 +51,12 @@ export function multiplierAt(t: number): number {
 }
 
 /** Seconds needed to reach (or pass) target multiplier. */
-export function timeToReach(target: number): number {
+export function timeToReach(
+  target: number,
+  stageList: readonly GrowthStage[] = getGrowthStages(),
+): number {
   if (target <= 1) return 0
-  const stages = resolved()
+  const stages = resolveStages(stageList)
   for (const s of stages) {
     if (target <= s.untilM || !Number.isFinite(s.untilM)) {
       return s.startT + Math.log(target / s.fromM) / s.rate
@@ -68,6 +73,15 @@ export function timeToReach(target: number): number {
 export function generateCrashPoint(rtp = gameConfig.crash.rtp): number {
   const u = Math.max(1e-12, Math.random())
   return Math.max(1, floor2(rtp / u))
+}
+
+/** 崩盘点 ≥ target 的概率（rtp/U 分布） */
+export function survivalProbability(
+  target: number,
+  rtp = gameConfig.crash.rtp,
+): number {
+  if (target <= 1) return 1
+  return Math.min(1, rtp / target)
 }
 
 /** PRD 色阶：&lt;10 白 / 10~20 蓝 / 21~50 橙 / ≥51 红 */

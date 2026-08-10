@@ -16,10 +16,13 @@ export const gameConfig = {
    */
   growth: {
     decimals: 2,
+    /** 5 段平滑减速：相邻 r 逐步下降，减少段切换时的手感拐点 */
     stages: [
-      { rate: 0.11, until: 20 },
-      { rate: 0.065, until: 100 },
-      { rate: 0.04, until: Infinity },
+      { rate: 0.14, until: 5 },
+      { rate: 0.1, until: 15 },
+      { rate: 0.07, until: 40 },
+      { rate: 0.05, until: 100 },
+      { rate: 0.03, until: Infinity },
     ],
   },
 
