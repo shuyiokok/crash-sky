@@ -11,6 +11,20 @@ const idleBet = (): BetState => ({
   profit: 0,
 })
 
+/** 追加采样点：始终保留原点 (0,1)，保证拖尾从原点连到小球 */
+function appendChartPoint(
+  prev: { t: number; m: number }[],
+  point: { t: number; m: number },
+  maxPoints: number,
+) {
+  const origin = prev[0] ?? { t: 0, m: 1 }
+  const next = [...prev, point]
+  if (next.length <= maxPoints) return next
+  // 保留首点 + 最近的尾部
+  const keep = maxPoints - 1
+  return [origin, ...next.slice(next.length - keep)]
+}
+
 export function useCrashGame() {
   const { bettingMs, crashHoldMs, maxChartPoints, historyLimit, sessionPlays } =
     gameConfig.round
@@ -194,23 +208,15 @@ export function useCrashGame() {
 
       if (crashAt != null && m >= crashAt) {
         setMultiplier(crashAt)
-        setPoints((prev) => {
-          const next = [...prev, { t, m: crashAt }]
-          return next.length > maxChartPoints
-            ? next.slice(next.length - maxChartPoints)
-            : next
-        })
+        setPoints((prev) =>
+          appendChartPoint(prev, { t, m: crashAt }, maxChartPoints),
+        )
         finishCrash(crashAt)
         return
       }
 
       setMultiplier(m)
-      setPoints((prev) => {
-        const next = [...prev, { t, m }]
-        return next.length > maxChartPoints
-          ? next.slice(next.length - maxChartPoints)
-          : next
-      })
+      setPoints((prev) => appendChartPoint(prev, { t, m }, maxChartPoints))
 
       const current = betRef.current
       if (

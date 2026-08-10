@@ -174,12 +174,30 @@ export function ChartCanvas({
       ctx.fillText(label, xOf(t), h - 12)
     })
 
-    if (points.length < 2) return
+    if (points.length < 1) return
 
-    const pts = points.map((p) => ({
+    // 始终从原点出发，并让终点贴合当前小球位置
+    const liveT = points.at(-1)?.t ?? 0
+    const raw = points[0]!.t === 0 && points[0]!.m === 1
+      ? points
+      : [{ t: 0, m: 1 }, ...points]
+    const withTip =
+      phase === 'flying' || phase === 'crashed'
+        ? [
+            ...raw.slice(0, -1),
+            {
+              t: liveT,
+              m: phase === 'crashed' ? (crashPoint ?? multiplier) : multiplier,
+            },
+          ]
+        : raw
+
+    const pts = withTip.map((p) => ({
       x: xOf(p.t),
-      y: yOf(Math.max(0, p.m)),
+      y: yOf(Math.max(1, p.m)),
     }))
+    // 强制原点坐标落在图表原点
+    pts[0] = { x: xOf(0), y: yOf(1) }
     const last = pts[pts.length - 1]!
     const crashed = phase === 'crashed'
 
@@ -263,6 +281,50 @@ export function ChartCanvas({
     ctx.fillStyle = tipColor.c
     ctx.arc(last.x, last.y, 2.6, 0, Math.PI * 2)
     ctx.fill()
+
+    // 轴线游标：Y/X 轴刻度线，跟随当前小球
+    if (phase === 'flying' || phase === 'crashed') {
+      const tipM =
+        phase === 'crashed' ? (crashPoint ?? multiplier) : multiplier
+      const tipT = liveT
+      const ax = PAD.l
+      const ay = PAD.t + plotH
+      const cy = yOf(Math.max(1, tipM))
+      const cx = xOf(tipT)
+      const cursorColor = crashed
+        ? 'rgba(255, 140, 155, 0.95)'
+        : 'rgba(140, 225, 255, 0.95)'
+      const ghost = crashed
+        ? 'rgba(255, 120, 140, 0.22)'
+        : 'rgba(120, 220, 255, 0.2)'
+
+      // 辅助虚线：小球投影到两轴
+      ctx.setLineDash([4, 4])
+      ctx.strokeStyle = ghost
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(ax, cy)
+      ctx.lineTo(last.x, last.y)
+      ctx.lineTo(cx, ay)
+      ctx.stroke()
+      ctx.setLineDash([])
+
+      ctx.strokeStyle = cursorColor
+      ctx.lineWidth = 2
+      ctx.lineCap = 'round'
+
+      // Y 轴刻度线（水平短线）
+      ctx.beginPath()
+      ctx.moveTo(ax - 10, cy)
+      ctx.lineTo(ax + 4, cy)
+      ctx.stroke()
+
+      // X 轴刻度线（竖直短线）
+      ctx.beginPath()
+      ctx.moveTo(cx, ay - 4)
+      ctx.lineTo(cx, ay + 10)
+      ctx.stroke()
+    }
 
     if (crashed) {
       ctx.strokeStyle = 'rgba(255, 120, 140, 0.75)'
